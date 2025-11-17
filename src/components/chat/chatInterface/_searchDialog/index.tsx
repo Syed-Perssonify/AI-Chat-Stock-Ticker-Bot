@@ -130,7 +130,7 @@ export function SearchDialog({
                 onSelectChat(chat.id);
                 handleOpenChange(false);
               }}
-              className="flex items-center gap-2 cursor-pointer [&:hover>*]:text-white [&:hover_*]:text-white dark:[&:hover>*]:text-white dark:[&:hover_*]:text-white"
+              className="flex items-center gap-2 cursor-pointer dark:[&:hover>*]:text-white dark:[&:hover_*]:text-white"
             >
               <MessageSquare className="h-4 w-4 shrink-0" />
               <div className="flex-1 min-w-0">

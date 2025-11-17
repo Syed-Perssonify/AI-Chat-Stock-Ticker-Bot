@@ -229,22 +229,53 @@ interface ChatInterfaceProps {
 export function ChatInterface(
   { chatId }: ChatInterfaceProps = {} as ChatInterfaceProps
 ) {
-  const [defaultOpen, setDefaultOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
-    // Read sidebar state from cookie on client side only
-    if (typeof document !== "undefined") {
-      const cookies = document.cookie.split("; ");
-      const sidebarCookie = cookies.find((c) => c.startsWith("sidebar:state="));
-      if (sidebarCookie) {
-        const isOpen = sidebarCookie.split("=")[1] === "true";
-        setDefaultOpen(isOpen);
+    // Set sidebar state based on screen size
+    const updateSidebarState = () => {
+      if (typeof window !== "undefined") {
+        const isLargeScreen = window.innerWidth >= 1080;
+        if (isLargeScreen) {
+          // On large screens, read from cookie or default to true
+          const cookies = document.cookie.split("; ");
+          const sidebarCookie = cookies.find((c) =>
+            c.startsWith("sidebar:state=")
+          );
+          if (sidebarCookie) {
+            const isOpen = sidebarCookie.split("=")[1] === "true";
+            setSidebarOpen(isOpen);
+          } else {
+            setSidebarOpen(true);
+          }
+        } else {
+          // On small screens, always force closed
+          setSidebarOpen(false);
+        }
       }
-    }
+    };
+
+    // Set initial state
+    updateSidebarState();
+
+    // Update on window resize
+    window.addEventListener("resize", updateSidebarState);
+    return () => window.removeEventListener("resize", updateSidebarState);
   }, []);
 
   return (
-    <SidebarProvider defaultOpen={defaultOpen}>
+    <SidebarProvider
+      open={sidebarOpen}
+      onOpenChange={(open) => {
+        // Only allow opening on large screens
+        if (typeof window !== "undefined" && window.innerWidth >= 1080) {
+          setSidebarOpen(open);
+        } else {
+          // Force closed on small screens
+          setSidebarOpen(false);
+        }
+      }}
+    >
       <ChatContent chatId={chatId} />
     </SidebarProvider>
   );

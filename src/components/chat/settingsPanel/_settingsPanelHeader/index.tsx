@@ -36,13 +36,13 @@ export function SettingsPanelHeader({
   const isDark = mounted && resolvedTheme === "dark";
 
   return (
-    <div className="flex items-center justify-between gap-4 px-6 py-4 border-b shrink-0">
+    <div className="flex items-center justify-between gap-4 px-6 py-[3.1%] border-b shrink-0">
       <div className="flex items-center gap-3">
-        <div className="flex items-center justify-center h-10 w-10 rounded-lg bg-primary/10 shrink-0">
+        <div className="flex items-center justify-center h-8 w-8 rounded-md bg-primary/10 shrink-0">
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            width="20"
-            height="20"
+            width="16"
+            height="16"
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
@@ -55,7 +55,7 @@ export function SettingsPanelHeader({
             <circle cx="12" cy="12" r="3" />
           </svg>
         </div>
-        <h2 className="text-xl font-semibold">Settings</h2>
+        <h2 className="text-base font-semibold">Settings</h2>
       </div>
 
       <TooltipProvider>

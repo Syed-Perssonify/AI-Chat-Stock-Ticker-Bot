@@ -91,8 +91,7 @@ export function ChatHistory({
                               "text-sm truncate flex-1 min-w-0",
                               currentChatId === chat.id
                                 ? "font-medium text-foreground"
-                                : "text-foreground/90",
-                              "group-hover/chat:text-white dark:group-hover/chat:text-white"
+                                : "text-foreground/90"
                             )}
                           >
                             {chat.title}

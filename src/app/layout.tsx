@@ -12,11 +12,6 @@ export const metadata: Metadata = {
   icons: {
     icon: "/favicon.ico",
   },
-  openGraph: {
-    title: params.name,
-    description: params.tagline,
-    images: "/icons/favicon.ico",
-  },
 };
 
 export default function RootLayout({

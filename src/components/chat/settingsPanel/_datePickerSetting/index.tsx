@@ -60,6 +60,9 @@ export function DatePickerSetting({
             onSelect={(date) => onChange(date || null)}
             initialFocus
             disabled={disabled}
+            captionLayout="dropdown"
+            fromYear={2000}
+            toYear={new Date().getFullYear() + 1}
           />
         </PopoverContent>
       </Popover>

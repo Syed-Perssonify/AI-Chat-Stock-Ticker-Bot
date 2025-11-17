@@ -24,7 +24,7 @@ export function DesktopSidebar({
   onSearchOpen,
 }: DesktopSidebarProps) {
   return (
-    <Sidebar collapsible="icon" className="border-r">
+    <Sidebar collapsible="icon" className="border-r hidden min-[1080px]:block">
       <SidebarHeader onNewChat={onNewChat} onSearchOpen={onSearchOpen} />
       <SidebarContent className="group-data-[collapsible=icon]:opacity-0 group-data-[collapsible=icon]:pointer-events-none">
         <ChatHistory
