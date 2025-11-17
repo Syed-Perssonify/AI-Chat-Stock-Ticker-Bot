@@ -61,7 +61,7 @@ export function SidebarHeader({ onNewChat, onSearchOpen }: SidebarHeaderProps) {
           <Button
             onClick={logout}
             variant="ghost"
-            className="w-full gap-2 justify-start h-auto py-2 px-3 font-normal text-destructive hover:text-destructive"
+            className="w-full gap-2 justify-start h-auto py-2 px-3 font-normal text-destructive hover:text-destructive hover:bg-destructive/10"
           >
             <LogOut className="h-4 w-4 shrink-0" />
             <span>Logout</span>
@@ -140,7 +140,7 @@ export function SidebarHeader({ onNewChat, onSearchOpen }: SidebarHeaderProps) {
                 onClick={logout}
                 variant="ghost"
                 size="icon"
-                className="h-9 w-9 shrink-0 text-destructive hover:text-destructive"
+                className="h-9 w-9 shrink-0 text-destructive hover:text-destructive hover:bg-destructive/10"
               >
                 <LogOut className="h-4 w-4" />
               </Button>
