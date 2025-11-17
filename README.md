@@ -14,6 +14,8 @@ A modern, feature-rich AI chat interface built with Next.js 16, TypeScript, and 
 - ⚙️ **Customizable Settings** (temperature, top-p, max tokens, etc.)
 - 📱 **Responsive Design** for mobile and desktop
 - 🎯 **shadcn/ui Components** for beautiful UI
+- 🔍 **SEC Filing Analysis** - Integrated with DropAnalysis for SEC EDGAR filing analysis
+- 📊 **Structured Queries** - Support for ticker, form types, and date range filtering
 
 ## Tech Stack
 
@@ -50,7 +52,26 @@ yarn install
 pnpm install
 ```
 
-3. Run the development server:
+3. Set up environment variables:
+```bash
+# Copy the example env file
+cp .env.example .env.local
+
+# Edit .env.local and set your DropAnalysis API URL
+# DROPANALYSIS_API_URL=http://localhost:8000
+```
+
+4. Make sure the DropAnalysis backend is running:
+```bash
+# In the DropAnalysis directory
+cd ../DropAnalysis
+poetry install
+poetry run python app.py
+# Or use uvicorn directly
+uvicorn app:app --host 0.0.0.0 --port 8000
+```
+
+5. Run the development server:
 ```bash
 npm run dev
 # or
@@ -59,7 +80,7 @@ yarn dev
 pnpm dev
 ```
 
-4. Open [http://localhost:3000](http://localhost:3000) with your browser to see the application.
+6. Open [http://localhost:3000](http://localhost:3000) with your browser to see the application.
 
 ## Project Structure
 
@@ -188,4 +209,31 @@ This project is open source and available under the [MIT License](LICENSE).
 
 ---
 
-**Note**: This is a demo application with simulated AI responses. To connect to a real AI API (OpenAI, Anthropic, etc.), you'll need to implement the API integration in `src/hooks/useChat.ts`.
+## DropAnalysis Integration
+
+This application is integrated with the DropAnalysis backend for SEC EDGAR filing analysis. The integration provides:
+
+- **Free-form Queries**: Ask natural language questions about SEC filings
+- **Structured Analysis**: Use settings panel to specify ticker, form types, and date ranges
+- **Real-time Streaming**: See responses stream in real-time as the analysis progresses
+- **SEC Data Access**: Direct access to real SEC EDGAR filing data through the DropAnalysis backend
+
+### Configuration
+
+Set the `DROPANALYSIS_API_URL` environment variable to point to your DropAnalysis backend:
+
+```bash
+# .env.local
+DROPANALYSIS_API_URL=http://localhost:8000
+```
+
+### Usage
+
+1. **Free-form Query**: Simply type a question like "Get Apple's latest 10-K filing"
+2. **Structured Analysis**: 
+   - Set Stock Ticker (e.g., "AAPL")
+   - Set Form Types (e.g., "10-K,10-Q")
+   - Set Date Range (optional)
+   - Type your query or let the system analyze based on settings
+
+The API route (`src/app/api/chat/route.ts`) automatically routes to the appropriate DropAnalysis endpoint based on your settings.

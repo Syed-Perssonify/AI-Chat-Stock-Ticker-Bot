@@ -2,12 +2,21 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
+import { params } from "@/common/config/params";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "AI Chat Studio",
-  description: "A modern AI chat interface built with Next.js and TypeScript",
+  title: params.name,
+  description: params.tagline,
+  icons: {
+    icon: "/favicon.ico",
+  },
+  openGraph: {
+    title: params.name,
+    description: params.tagline,
+    images: "/icons/favicon.ico",
+  },
 };
 
 export default function RootLayout({

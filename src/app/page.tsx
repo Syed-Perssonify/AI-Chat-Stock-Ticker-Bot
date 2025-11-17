@@ -1,9 +1,6 @@
-import { ChatInterface } from "@/components/chat/ChatInterface";
+import { redirect } from "next/navigation";
+import { ROUTES } from "@/common/routes";
 
 export default function Home() {
-  return (
-    <main className="h-screen overflow-hidden">
-      <ChatInterface />
-    </main>
-  );
+  redirect(ROUTES.NEW_CHAT);
 }

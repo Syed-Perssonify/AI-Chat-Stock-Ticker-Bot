@@ -10,7 +10,7 @@ interface MarkdownRendererProps {
 
 export function MarkdownRenderer({ content }: MarkdownRendererProps) {
   return (
-    <div className="prose prose-sm max-w-none dark:prose-invert prose-p:leading-relaxed prose-pre:p-0">
+    <div className="prose prose-sm max-w-none dark:prose-invert prose-p:leading-relaxed prose-pre:p-0 break-words overflow-wrap-anywhere">
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         components={{
@@ -22,13 +22,16 @@ export function MarkdownRenderer({ content }: MarkdownRendererProps) {
               <CodeBlock language={match[1]} code={codeContent} />
             ) : (
               <code
-                className="bg-muted px-1.5 py-0.5 rounded text-sm font-mono"
+                className="bg-muted px-1.5 py-0.5 rounded text-sm font-mono break-words"
                 {...props}
               >
                 {children}
               </code>
             );
           },
+          p: ({ children }: any) => (
+            <p className="break-words overflow-wrap-anywhere">{children}</p>
+          ),
         }}
       >
         {content}

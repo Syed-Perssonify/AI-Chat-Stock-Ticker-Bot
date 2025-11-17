@@ -7,7 +7,9 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { RotateCcw, X } from "lucide-react";
+import { RotateCcw, X, Sun, Moon } from "lucide-react";
+import { useTheme } from "next-themes";
+import { useEffect, useState } from "react";
 
 interface SettingsPanelHeaderProps {
   onReset: () => void;
@@ -18,6 +20,21 @@ export function SettingsPanelHeader({
   onReset,
   onClose,
 }: SettingsPanelHeaderProps) {
+  const { theme, setTheme, resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  // Avoid hydration mismatch
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const toggleTheme = () => {
+    const currentTheme = resolvedTheme || theme || "light";
+    setTheme(currentTheme === "dark" ? "light" : "dark");
+  };
+
+  const isDark = mounted && resolvedTheme === "dark";
+
   return (
     <div className="flex items-center justify-between gap-4 px-6 py-4 border-b shrink-0">
       <div className="flex items-center gap-3">
@@ -58,6 +75,27 @@ export function SettingsPanelHeader({
               <p>Reset to defaults</p>
             </TooltipContent>
           </Tooltip>
+          {mounted && (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={toggleTheme}
+                  className="h-9 w-9 shrink-0"
+                >
+                  {isDark ? (
+                    <Sun className="h-4 w-4" />
+                  ) : (
+                    <Moon className="h-4 w-4" />
+                  )}
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>{isDark ? "Switch to light mode" : "Switch to dark mode"}</p>
+              </TooltipContent>
+            </Tooltip>
+          )}
           {onClose && (
             <Tooltip>
               <TooltipTrigger asChild>

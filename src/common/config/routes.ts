@@ -1,5 +1,7 @@
-export const HOME = "/";
-export const NEW_CHAT = "/new";
-export const CHAT = "/chat";
+export const routes = {
+  HOME: "/",
+  NEW_CHAT: "/chat/new",
+  CHAT: "/chat",
+} as const;
 
-export const getChatRoute = (chatId: string): string => `${CHAT}/${chatId}`;
+export const getChatRoute = (chatId: string) => `${routes.CHAT}/${chatId}`;

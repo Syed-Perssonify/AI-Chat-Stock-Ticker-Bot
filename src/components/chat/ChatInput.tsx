@@ -3,17 +3,31 @@
 import { useState, useRef, useEffect, KeyboardEvent } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Badge } from "@/components/ui/badge";
-import { Send, Square, Paperclip, X, FileText, ArrowUp } from "lucide-react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { Square, ArrowUp, BrainCircuit } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTypingPlaceholder } from "@/hooks/useTypingPlaceholder";
 import { toast } from "@/hooks/use-toast";
+import { Badge } from "@/components/ui/badge";
 
 interface ChatInputProps {
-  onSend: (message: string, files?: File[]) => void;
+  onSend: (message: string, files?: File[], deepAnalysis?: boolean) => void;
   isLoading: boolean;
   disabled?: boolean;
   onStop?: () => void;
+  deepAnalysis?: boolean;
+  onDeepAnalysisChange?: (enabled: boolean) => void;
+  settings?: {
+    stockTicker?: string;
+    formTypes?: string;
+    startDate?: Date | null;
+    endDate?: Date | null;
+  };
 }
 
 export function ChatInput({
@@ -21,21 +35,32 @@ export function ChatInput({
   isLoading,
   disabled = false,
   onStop,
+  deepAnalysis = false,
+  onDeepAnalysisChange,
+  settings,
 }: ChatInputProps) {
   const [input, setInput] = useState("");
-  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const documentInputRef = useRef<HTMLInputElement>(null);
-  const imageInputRef = useRef<HTMLInputElement>(null);
 
   // Typing animation for placeholder
   const placeholderTexts = [
-    "Basic 10-K Review",
-    "3-Year Timeline Analysis",
-    "Multiple Form Comparison",
-    "Date Range Evaluation",
-    "Stock Performance Analysis",
+    "Analyze Apple's latest 10-K filing",
+    "Compare revenue trends for AAPL and MSFT",
+    "What are Tesla's main risk factors?",
+    "Show financial highlights from latest 10-Q",
+    "Analyze business segments and operations",
+    "Extract XBRL data for cash flow analysis",
+    "Compare filings across last 3 years",
+    "Identify key risk factors and concerns",
+    "Evaluate strategic initiatives and goals",
+    "Show financial performance metrics",
+    "Compare revenue sources and breakdown",
+    "Show top expenses and cost structure",
+    "Show top assets and liabilities",
+    "Show top shareholders and ownership",
+    "Show top management and compensation",
+    "Show top competitors and market share",
+    "Show top news and events",
   ];
   const typingPlaceholder = useTypingPlaceholder(
     placeholderTexts,
@@ -52,14 +77,50 @@ export function ChatInput({
     }
   }, [input]);
 
+  const validateSettings = (): { valid: boolean; missingFields: string[] } => {
+    const missingFields: string[] = [];
+
+    if (!settings?.stockTicker?.trim()) {
+      missingFields.push("Stock Ticker");
+    }
+    if (!settings?.formTypes?.trim()) {
+      missingFields.push("Form Types");
+    }
+    if (!settings?.startDate) {
+      missingFields.push("Start Date");
+    }
+    if (!settings?.endDate) {
+      missingFields.push("End Date");
+    }
+
+    return {
+      valid: missingFields.length === 0,
+      missingFields,
+    };
+  };
+
   const handleSend = () => {
-    if (input.trim() && !disabled) {
-      onSend(input.trim(), selectedFiles);
-      setInput("");
-      setSelectedFiles([]);
-      if (textareaRef.current) {
-        textareaRef.current.style.height = "auto";
-      }
+    if (!input.trim() || disabled) return;
+
+    // Validate settings before sending
+    const validation = validateSettings();
+    if (!validation.valid) {
+      toast({
+        title: "Settings Required",
+        description: `Please fill in all required settings: ${validation.missingFields.join(
+          ", "
+        )}`,
+        variant: "destructive",
+        duration: 4000,
+      });
+      return;
+    }
+
+    // All settings are valid, proceed with sending
+    onSend(input.trim(), undefined, deepAnalysis);
+    setInput("");
+    if (textareaRef.current) {
+      textareaRef.current.style.height = "auto";
     }
   };
 
@@ -70,119 +131,33 @@ export function ChatInput({
     }
   };
 
-  // Global keyboard shortcuts
-  useEffect(() => {
-    const handleGlobalKeyDown = (e: globalThis.KeyboardEvent) => {
-      // Ctrl+D for documents
-      if (e.ctrlKey && e.key === "d") {
-        e.preventDefault();
-        documentInputRef.current?.click();
-      }
-      // Ctrl+I for images
-      if (e.ctrlKey && e.key === "i") {
-        e.preventDefault();
-        imageInputRef.current?.click();
-      }
-    };
-
-    window.addEventListener("keydown", handleGlobalKeyDown);
-    return () => {
-      window.removeEventListener("keydown", handleGlobalKeyDown);
-    };
-  }, []);
-
   const handleStop = () => {
     if (onStop) {
       onStop();
     }
   };
 
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || []);
-    const maxFiles = 5;
+  const handleDeepAnalysisToggle = () => {
+    const newState = !deepAnalysis;
+    onDeepAnalysisChange?.(newState);
 
-    if (selectedFiles.length + files.length > maxFiles) {
-      toast({
-        title: "Too many files",
-        description: `You can only select up to ${maxFiles} files.`,
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setSelectedFiles([...selectedFiles, ...files]);
-    // Reset input value to allow selecting the same file again
-    e.target.value = "";
-  };
-
-  const handleDocumentSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || []);
-    const maxFiles = 5;
-
-    if (selectedFiles.length + files.length > maxFiles) {
-      toast({
-        title: "Too many files",
-        description: `You can only select up to ${maxFiles} files.`,
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setSelectedFiles([...selectedFiles, ...files]);
-    e.target.value = "";
-  };
-
-  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || []);
-    const maxFiles = 5;
-
-    if (selectedFiles.length + files.length > maxFiles) {
-      toast({
-        title: "Too many files",
-        description: `You can only select up to ${maxFiles} files.`,
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setSelectedFiles([...selectedFiles, ...files]);
-    e.target.value = "";
-  };
-
-  const removeFile = (index: number) => {
-    setSelectedFiles(selectedFiles.filter((_, i) => i !== index));
+    // Show toast notification
+    toast({
+      title: newState ? "Deep Analysis Enabled" : "Deep Analysis Disabled",
+      description: newState
+        ? "Multi-filing timeline analysis will be performed. This may take 1-3 minutes."
+        : "Using standard analysis mode for faster responses.",
+      duration: 3000,
+    });
   };
 
   const isEmpty = !input.trim();
-  const canSend = !isEmpty && !disabled;
+  const validation = validateSettings();
+  const canSend = !isEmpty && !disabled && validation.valid;
 
   return (
     <div className="border-t bg-background p-4 shrink-0">
       <div className="mx-auto max-w-4xl px-4">
-        {/* Selected Files Display */}
-        {selectedFiles.length > 0 && (
-          <div className="flex flex-wrap gap-2 mb-2">
-            {selectedFiles.map((file, index) => (
-              <Badge
-                key={index}
-                variant="outline"
-                className="gap-2 pr-1 max-w-[200px]"
-              >
-                <FileText className="h-3 w-3 shrink-0" />
-                <span className="truncate text-xs">{file.name}</span>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-4 w-4 p-0 hover:bg-destructive hover:text-destructive-foreground"
-                  onClick={() => removeFile(index)}
-                >
-                  <X className="h-3 w-3" />
-                </Button>
-              </Badge>
-            ))}
-          </div>
-        )}
-
         {/* Input Area */}
         <div className="relative">
           <Textarea
@@ -199,16 +174,53 @@ export function ChatInput({
             rows={1}
           />
 
-          {/* Attach File Button (Left Side) */}
-          <Button
-            variant="ghost"
-            size="icon"
-            className="absolute left-2 top-1/2 -translate-y-1/2 h-8 w-8 text-muted-foreground hover:text-foreground"
-            onClick={() => fileInputRef.current?.click()}
-            disabled={disabled}
-          >
-            <Paperclip className="h-4 w-4" />
-          </Button>
+          {/* Deep Analysis Button (Left Side) */}
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div className="absolute left-2 top-1/2 -translate-y-1/2">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className={cn(
+                      "relative h-8 w-8",
+                      deepAnalysis
+                        ? "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground"
+                        : "text-muted-foreground hover:text-foreground"
+                    )}
+                    onClick={handleDeepAnalysisToggle}
+                    disabled={disabled}
+                  >
+                    <BrainCircuit
+                      className={cn(
+                        "h-4 w-4",
+                        deepAnalysis
+                          ? "text-primary-foreground fill-primary-foreground"
+                          : ""
+                      )}
+                    />
+                    {/* Active indicator badge */}
+                    {deepAnalysis && (
+                      <Badge
+                        variant="secondary"
+                        className="absolute -top-1 -right-1 h-2 w-2 p-0 bg-primary-foreground border-2 border-primary rounded-full"
+                      />
+                    )}
+                  </Button>
+                </div>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>
+                  {deepAnalysis ? "Deep Analysis: ON" : "Deep Analysis: OFF"}
+                </p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  {deepAnalysis
+                    ? "Multi-filing timeline analysis enabled"
+                    : "Click to enable deep timeline analysis"}
+                </p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
 
           {/* Send/Stop Button (Right Side) */}
           <div className="absolute right-2 top-1/2 -translate-y-1/2">
@@ -236,35 +248,18 @@ export function ChatInput({
           </div>
         </div>
 
-        {/* Hidden File Inputs */}
-        <input
-          ref={fileInputRef}
-          type="file"
-          multiple
-          accept="*/*"
-          onChange={handleFileSelect}
-          className="hidden"
-        />
-        <input
-          ref={documentInputRef}
-          type="file"
-          multiple
-          accept=".pdf,.doc,.docx,.txt,.rtf,.odt"
-          onChange={handleDocumentSelect}
-          className="hidden"
-        />
-        <input
-          ref={imageInputRef}
-          type="file"
-          multiple
-          accept="image/*"
-          onChange={handleImageSelect}
-          className="hidden"
-        />
-
-        <p className="mt-2 text-xs text-muted-foreground text-center">
-          Press Enter to send, Shift+Enter for new line • Ctrl+D for documents
-        </p>
+        {/* Settings validation message */}
+        {!validation.valid && input.trim() && (
+          <p className="mt-2 text-xs text-destructive text-center">
+            ⚠️ Please complete all settings:{" "}
+            {validation.missingFields.join(", ")}
+          </p>
+        )}
+        {validation.valid && (
+          <p className="mt-2 text-xs text-muted-foreground text-center">
+            Press Enter to send, Shift+Enter for new line
+          </p>
+        )}
       </div>
     </div>
   );

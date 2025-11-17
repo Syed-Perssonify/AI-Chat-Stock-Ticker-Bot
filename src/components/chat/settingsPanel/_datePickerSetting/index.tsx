@@ -19,6 +19,8 @@ interface DatePickerSettingProps {
   onChange: (date: Date | null) => void;
   placeholder?: string;
   disabled?: (date: Date) => boolean;
+  required?: boolean;
+  inputDisabled?: boolean;
 }
 
 export function DatePickerSetting({
@@ -28,14 +30,13 @@ export function DatePickerSetting({
   onChange,
   placeholder = "Pick a date",
   disabled,
+  required = false,
+  inputDisabled = false,
 }: DatePickerSettingProps) {
   return (
     <div className="space-y-3">
-      <Label
-        htmlFor={id}
-        className="text-sm font-medium cursor-pointer"
-      >
-        {label}
+      <Label htmlFor={id} className="text-sm font-medium cursor-pointer">
+        {label} {required && <span className="text-destructive">*</span>}
       </Label>
       <Popover>
         <PopoverTrigger asChild>
@@ -46,6 +47,7 @@ export function DatePickerSetting({
               "w-full justify-start text-left font-normal cursor-pointer",
               !value && "text-muted-foreground"
             )}
+            disabled={inputDisabled}
           >
             <CalendarIcon className="mr-2 h-4 w-4" />
             {value ? format(value, "PPP") : <span>{placeholder}</span>}
@@ -64,4 +66,3 @@ export function DatePickerSetting({
     </div>
   );
 }
-

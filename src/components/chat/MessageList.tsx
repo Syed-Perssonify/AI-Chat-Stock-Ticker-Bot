@@ -11,6 +11,7 @@ interface MessageListProps {
   onRegenerate?: () => void;
   isLoading?: boolean;
   onSendMessage?: (message: string) => void;
+  onEditMessage?: (messageId: string, newContent: string) => void;
 }
 
 export function MessageList({
@@ -19,17 +20,37 @@ export function MessageList({
   onRegenerate,
   isLoading,
   onSendMessage,
+  onEditMessage,
 }: MessageListProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
   const [greeting, setGreeting] = useState("Good afternoon");
+  const isUserScrolledUpRef = useRef(false);
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+    const container = scrollRef.current;
+    if (!container) return;
+
+    const handleScroll = () => {
+      const { scrollTop, scrollHeight, clientHeight } = container;
+      const distanceFromBottom = scrollHeight - scrollTop - clientHeight;
+      isUserScrolledUpRef.current = distanceFromBottom > 100;
+    };
+
+    container.addEventListener("scroll", handleScroll);
+    return () => container.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  useEffect(() => {
+    const container = scrollRef.current;
+    if (!container || isUserScrolledUpRef.current) return;
+
+    requestAnimationFrame(() => {
+      bottomRef.current?.scrollIntoView({ behavior: "auto" });
+    });
   }, [messages, streamingMessage]);
 
   useEffect(() => {
-    // Only run on client side to avoid hydration mismatch
     const greetings = [
       "Good morning",
       "Good afternoon ",
@@ -44,17 +65,15 @@ export function MessageList({
     const currentHour = new Date().getHours();
     let selectedGreeting;
 
-    // Time-based greetings (60% of the time)
     if (Math.random() < 0.6) {
       if (currentHour < 12) {
-        selectedGreeting = greetings[0]; // Good morning
+        selectedGreeting = greetings[0];
       } else if (currentHour < 18) {
-        selectedGreeting = greetings[1]; // Good afternoon
+        selectedGreeting = greetings[1];
       } else {
-        selectedGreeting = greetings[2]; // Good evening
+        selectedGreeting = greetings[2];
       }
     } else {
-      // Random work-related greeting (40% of the time)
       const workGreetings = greetings.slice(3);
       selectedGreeting =
         workGreetings[Math.floor(Math.random() * workGreetings.length)];
@@ -81,8 +100,8 @@ export function MessageList({
   }
 
   return (
-    <div className="flex-1 overflow-y-auto" ref={scrollRef}>
-      <div className="mx-auto max-w-6xl px-6 py-4">
+    <div className="flex-1 overflow-y-auto overflow-x-hidden" ref={scrollRef}>
+      <div className="mx-auto max-w-6xl px-6 py-4 w-full">
         {allMessages.map((message, index) => (
           <ChatMessage
             key={`${message.id}-${message.isStreaming ? "streaming" : "final"}`}
@@ -92,6 +111,7 @@ export function MessageList({
                 ? onRegenerate
                 : undefined
             }
+            onEditMessage={onEditMessage}
             showActions={!message.isStreaming}
           />
         ))}

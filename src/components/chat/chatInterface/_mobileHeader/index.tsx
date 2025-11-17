@@ -68,10 +68,7 @@ export function MobileHeader({
         </SheetContent>
       </Sheet>
 
-      <h1 className="text-base font-semibold truncate">
-        {" "}
-        AI Chat Stock Ticker Bot
-      </h1>
+      <h1 className="text-base font-semibold truncate">DropAnalysis</h1>
 
       <Sheet open={settingsOpen} onOpenChange={setSettingsOpen}>
         <SheetTrigger asChild>

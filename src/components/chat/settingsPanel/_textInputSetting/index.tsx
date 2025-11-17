@@ -11,6 +11,7 @@ interface TextInputSettingProps {
   placeholder?: string;
   description?: string;
   required?: boolean;
+  disabled?: boolean;
 }
 
 export function TextInputSetting({
@@ -21,6 +22,7 @@ export function TextInputSetting({
   placeholder,
   description,
   required = false,
+  disabled = false,
 }: TextInputSettingProps) {
   return (
     <div className="space-y-2">
@@ -34,6 +36,7 @@ export function TextInputSetting({
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
         className="cursor-text"
+        disabled={disabled}
       />
       {description && (
         <p className="text-xs text-muted-foreground">{description}</p>

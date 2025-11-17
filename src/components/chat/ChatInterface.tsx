@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import { useParams, usePathname } from "next/navigation";
 import { useChat } from "@/hooks/useChat";
 import { useChatHistory } from "@/hooks/useChatHistory";
 import { MessageList } from "./MessageList";
@@ -13,12 +14,30 @@ import { MobileHeader } from "./chatInterface/_mobileHeader";
 import { DesktopSidebar } from "./chatInterface/_desktopSidebar";
 import { SearchDialog } from "./chatInterface/_searchDialog";
 import { DesktopSettingsPanel } from "./chatInterface/_desktopSettingsPanel";
+import { ROUTES } from "@/common/routes";
+import { useChatRouting } from "./chatInterface/_hooks/useChatRouting";
+import { useChatSync } from "./chatInterface/_hooks/useChatSync";
+import { useMessageEditing } from "./chatInterface/_hooks/useMessageEditing";
+import { useChatMessages } from "./chatInterface/_hooks/useChatMessages";
+import { useChatTitle } from "./chatInterface/_hooks/useChatTitle";
+import { ChatHeader } from "./chatInterface/_chatHeader";
 
-function ChatContent() {
+interface ChatContentProps {
+  chatId?: string;
+}
+
+function ChatContent({ chatId: chatIdProp }: ChatContentProps) {
+  const params = useParams();
+  const pathname = usePathname();
   const isMobile = useIsMobile();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+
+  // Get chatId from props or URL params
+  const chatIdFromUrl = params?.chatId as string | undefined;
+  const chatId = chatIdProp || chatIdFromUrl;
+  const isNewChatRoute = pathname === ROUTES.NEW_CHAT;
 
   const {
     chats,
@@ -29,32 +48,33 @@ function ChatContent() {
     deleteChat,
     selectChat,
     generateChatTitle,
-    isHydrated,
   } = useChatHistory();
+
+  // Track newly created chatId for immediate use
+  const newlyCreatedChatIdRef = useRef<string | undefined>(undefined);
+
+  // Sync URL chatId with currentChatId
+  useChatSync({ chatId, currentChatId, selectChat });
 
   const [settings, setSettings] = useState(
     currentChat?.settings || DEFAULT_SETTINGS
   );
 
-  const handleMessagesChange = useCallback(
-    (messages: any[]) => {
-      if (currentChatId) {
-        const title =
-          messages.length === 1
-            ? generateChatTitle(messages[0].content)
-            : currentChat?.title || "New Chat";
-
-        updateChat(currentChatId, { messages, title });
-      }
-    },
-    [currentChatId, currentChat?.title, updateChat, generateChatTitle]
-  );
+  // Handle chat title generation and message updates
+  const { handleMessagesChange } = useChatTitle({
+    currentChatId,
+    chatId,
+    currentChat,
+    updateChat,
+    generateChatTitle,
+    newlyCreatedChatIdRef,
+  });
 
   const {
     messages,
     streamingMessage,
     isLoading,
-    sendMessage,
+    sendMessage: originalSendMessage,
     stopGenerating,
     regenerateLastMessage,
     setMessages,
@@ -64,23 +84,47 @@ function ChatContent() {
     onMessagesChange: handleMessagesChange,
   });
 
-  useEffect(() => {
-    if (currentChat) {
-      setMessages(currentChat.messages);
-      setSettings(currentChat.settings);
-    }
-  }, [currentChatId, setMessages]);
+  // Handle routing and message sending
+  const {
+    sendMessage,
+    handleNewChat: baseHandleNewChat,
+    handleSelectChat,
+  } = useChatRouting({
+    isNewChatRoute,
+    messagesLength: messages.length,
+    createChat,
+    selectChat,
+    settings,
+    originalSendMessage,
+    newlyCreatedChatIdRef,
+    currentChatId,
+  });
 
   const handleNewChat = () => {
-    const newChat = createChat("New Chat", settings);
     setMessages([]);
     setSidebarOpen(false);
+    baseHandleNewChat();
   };
 
-  const handleSelectChat = (chatId: string) => {
-    selectChat(chatId);
-    setSidebarOpen(false);
-  };
+  // Sync messages when chat changes
+  useChatMessages({
+    chatId,
+    currentChatId,
+    currentChat,
+    isNewChatRoute,
+    setMessages,
+    setSettings,
+    newlyCreatedChatIdRef,
+    currentMessagesLength: messages.length,
+  });
+
+  // Handle message editing
+  const { handleEditMessage } = useMessageEditing({
+    messages,
+    setMessages,
+    settings,
+    isLoading,
+  });
 
   const handleSettingsChange = (newSettings: any) => {
     setSettings(newSettings);
@@ -88,13 +132,6 @@ function ChatContent() {
       updateChat(currentChatId, { settings: newSettings });
     }
   };
-
-  // Create initial chat if none exists (only after hydration)
-  useEffect(() => {
-    if (isHydrated && chats.length === 0) {
-      createChat();
-    }
-  }, [isHydrated, chats.length, createChat]);
 
   return (
     <div className="h-screen flex overflow-hidden bg-background w-full">
@@ -121,7 +158,7 @@ function ChatContent() {
         <DesktopSidebar
           chats={chats}
           currentChatId={currentChatId}
-          onSelect={selectChat}
+          onSelect={handleSelectChat}
           onCreate={handleNewChat}
           onDelete={deleteChat}
           onNewChat={handleNewChat}
@@ -134,7 +171,7 @@ function ChatContent() {
         open={searchOpen}
         onOpenChange={setSearchOpen}
         chats={chats}
-        onSelectChat={selectChat}
+        onSelectChat={handleSelectChat}
         onNewChat={handleNewChat}
       />
 
@@ -145,17 +182,32 @@ function ChatContent() {
           isMobile && "pt-16"
         )}
       >
+        {/* Chat Header - Shows current chat title */}
+        <ChatHeader
+          chatTitle={currentChat?.title}
+          isNewChat={isNewChatRoute || !currentChatId}
+        />
         <MessageList
           messages={messages}
           streamingMessage={streamingMessage}
           onRegenerate={regenerateLastMessage}
           isLoading={isLoading}
           onSendMessage={sendMessage}
+          onEditMessage={handleEditMessage}
         />
         <ChatInput
           onSend={sendMessage}
           isLoading={isLoading}
           onStop={stopGenerating}
+          deepAnalysis={settings.deepAnalysis}
+          onDeepAnalysisChange={(enabled) => {
+            const newSettings = { ...settings, deepAnalysis: enabled };
+            setSettings(newSettings);
+            if (currentChatId) {
+              updateChat(currentChatId, { settings: newSettings });
+            }
+          }}
+          settings={settings}
         />
       </div>
 
@@ -170,8 +222,13 @@ function ChatContent() {
   );
 }
 
-export function ChatInterface() {
-  // Always start with true on server, then sync on client
+interface ChatInterfaceProps {
+  chatId?: string;
+}
+
+export function ChatInterface(
+  { chatId }: ChatInterfaceProps = {} as ChatInterfaceProps
+) {
   const [defaultOpen, setDefaultOpen] = useState(true);
 
   useEffect(() => {
@@ -188,7 +245,7 @@ export function ChatInterface() {
 
   return (
     <SidebarProvider defaultOpen={defaultOpen}>
-      <ChatContent />
+      <ChatContent chatId={chatId} />
     </SidebarProvider>
   );
 }

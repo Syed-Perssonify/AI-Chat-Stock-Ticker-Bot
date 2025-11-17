@@ -79,7 +79,7 @@ export function ChatHistory({
                         key={chat.id}
                         className={cn(
                           "group/chat relative px-2 py-2 cursor-pointer transition-colors rounded-md",
-                          "hover:bg-gray-50",
+                          "hover:bg-gray-50 dark:hover:bg-muted/50",
                           currentChatId === chat.id && "bg-muted/30",
                           isFaded && "opacity-60"
                         )}
@@ -91,7 +91,8 @@ export function ChatHistory({
                               "text-sm truncate flex-1 min-w-0",
                               currentChatId === chat.id
                                 ? "font-medium text-foreground"
-                                : "text-foreground/90"
+                                : "text-foreground/90",
+                              "group-hover/chat:text-white dark:group-hover/chat:text-white"
                             )}
                           >
                             {chat.title}

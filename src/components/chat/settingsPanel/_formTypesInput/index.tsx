@@ -11,6 +11,8 @@ interface FormTypesInputProps {
   onChange: (value: string) => void;
   placeholder?: string;
   description?: string;
+  required?: boolean;
+  disabled?: boolean;
 }
 
 export function FormTypesInput({
@@ -20,6 +22,8 @@ export function FormTypesInput({
   onChange,
   placeholder,
   description,
+  required = false,
+  disabled = false,
 }: FormTypesInputProps) {
   const handleToggleAll = () => {
     onChange(value.toLowerCase() === "all" ? "" : "all");
@@ -28,7 +32,7 @@ export function FormTypesInput({
   return (
     <div className="space-y-2">
       <Label htmlFor={id} className="text-sm font-medium cursor-pointer">
-        {label}
+        {label} {required && <span className="text-destructive">*</span>}
       </Label>
       <div className="flex items-center gap-2">
         <Input
@@ -38,12 +42,14 @@ export function FormTypesInput({
           onChange={(e) => onChange(e.target.value)}
           placeholder={placeholder}
           className="cursor-text flex-1"
+          disabled={disabled}
         />
         <Button
           type="button"
           size="sm"
           onClick={handleToggleAll}
           className="shrink-0 bg-primary text-white aspect-square"
+          disabled={disabled}
         >
           ALL
         </Button>

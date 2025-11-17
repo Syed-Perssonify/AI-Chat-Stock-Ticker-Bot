@@ -11,17 +11,20 @@ import { MessageEditor } from "./chatMessage/_messageEditor";
 import { MessageBubble } from "./chatMessage/_messageBubble";
 import { AIMessageActions } from "./chatMessage/_aiMessageActions";
 import { UserMessageActions } from "./chatMessage/_userMessageActions";
+import { StreamDataView } from "./chatMessage/_streamDataView";
 
 interface ChatMessageProps {
   message: Message;
   onRegenerate?: () => void;
   onCopy?: () => void;
+  onEditMessage?: (messageId: string, newContent: string) => void;
   showActions?: boolean;
 }
 
 export function ChatMessage({
   message,
   onRegenerate,
+  onEditMessage,
   showActions = true,
 }: ChatMessageProps) {
   const [copied, setCopied] = useState(false);
@@ -143,11 +146,17 @@ export function ChatMessage({
   };
 
   const handleSaveEdit = () => {
-    if (editedContent.trim() !== message.content) {
-      toast({
-        title: "Message edited",
-        description: "Changes saved successfully.",
-      });
+    if (editedContent.trim() !== message.content && editedContent.trim()) {
+      // Call onEditMessage to update the message and send it
+      if (onEditMessage) {
+        onEditMessage(message.id, editedContent.trim());
+      } else {
+        // Fallback: just update locally
+        toast({
+          title: "Message edited",
+          description: "Changes saved successfully.",
+        });
+      }
     }
     setIsEditing(false);
   };
@@ -181,6 +190,10 @@ export function ChatMessage({
             isUser ? "items-end" : "items-start"
           )}
         >
+          {/* Stream Data View - Only for assistant messages with stream data */}
+          {!isUser && message.streamData && (
+            <StreamDataView streamData={message.streamData} />
+          )}
           <MessageBubble message={message} isUser={isUser} />
 
           <div
