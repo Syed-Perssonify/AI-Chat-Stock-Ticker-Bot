@@ -54,12 +54,19 @@ pnpm install
 
 3. Set up environment variables:
 ```bash
-# Copy the example env file
-cp .env.example .env.local
+# Create .env.local file in the root directory
+# Add the following variables:
 
-# Edit .env.local and set your DropAnalysis API URL
-# DROPANALYSIS_API_URL=http://localhost:8000
+# DropAnalysis API URL
+DROPANALYSIS_API_URL=http://localhost:8000
+
+# Authentication (Optional)
+# If ACCESS_PASSWORD is not set, the app works without authentication
+# If ACCESS_PASSWORD is set, users must login with this password
+ACCESS_PASSWORD=your-secure-password-here
 ```
+
+**Note**: If you don't set `ACCESS_PASSWORD`, the app will work without authentication (useful for development). If you set it, users will be redirected to `/login` and must enter this password to access the app.
 
 4. Make sure the DropAnalysis backend is running:
 ```bash
@@ -81,6 +88,31 @@ pnpm dev
 ```
 
 6. Open [http://localhost:3000](http://localhost:3000) with your browser to see the application.
+
+## Authentication
+
+### How to Login
+
+1. **Set up password** (if you want authentication):
+   - Create a `.env.local` file in the root directory
+   - Add: `ACCESS_PASSWORD=your-password-here`
+   - Restart your dev server
+
+2. **Access the login page**:
+   - If `ACCESS_PASSWORD` is set, visiting any page will redirect you to `/login`
+   - Or go directly to: `http://localhost:3000/login`
+
+3. **Enter your password**:
+   - Use the password you set in `ACCESS_PASSWORD`
+   - After successful login, you'll be redirected to the chat interface
+
+4. **Logout**:
+   - Click the "Logout" button in the sidebar header
+   - You'll be redirected back to the login page
+
+### Disable Authentication
+
+To disable authentication (for development), simply don't set `ACCESS_PASSWORD` in your `.env.local` file, or remove it if it's already set. The app will work without requiring login.
 
 ## Project Structure
 

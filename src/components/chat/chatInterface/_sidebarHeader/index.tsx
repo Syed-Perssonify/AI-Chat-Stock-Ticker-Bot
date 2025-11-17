@@ -14,7 +14,9 @@ import {
   Search,
   CircleFadingPlus,
   MessageSquare,
+  LogOut,
 } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
 import { cn } from "@/lib/utils";
 
 interface SidebarHeaderProps {
@@ -24,6 +26,7 @@ interface SidebarHeaderProps {
 
 export function SidebarHeader({ onNewChat, onSearchOpen }: SidebarHeaderProps) {
   const sidebar = useSidebar();
+  const { logout } = useAuth();
 
   return (
     <div className="p-4 border-b group-data-[collapsible=icon]:p-2">
@@ -54,6 +57,14 @@ export function SidebarHeader({ onNewChat, onSearchOpen }: SidebarHeaderProps) {
           >
             <Search className="h-4 w-4 shrink-0" />
             <span>Search chats</span>
+          </Button>
+          <Button
+            onClick={logout}
+            variant="ghost"
+            className="w-full gap-2 justify-start h-auto py-2 px-3 font-normal text-destructive hover:text-destructive"
+          >
+            <LogOut className="h-4 w-4 shrink-0" />
+            <span>Logout</span>
           </Button>
         </div>
       </div>
@@ -120,6 +131,22 @@ export function SidebarHeader({ onNewChat, onSearchOpen }: SidebarHeaderProps) {
             </TooltipTrigger>
             <TooltipContent side="right">
               <p>View messages</p>
+            </TooltipContent>
+          </Tooltip>
+
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                onClick={logout}
+                variant="ghost"
+                size="icon"
+                className="h-9 w-9 shrink-0 text-destructive hover:text-destructive"
+              >
+                <LogOut className="h-4 w-4" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent side="right">
+              <p>Logout</p>
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
