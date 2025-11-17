@@ -18,7 +18,9 @@ export function useLocalStorage<T>(
         setStoredValue(JSON.parse(item));
       }
     } catch (error) {
-      console.error(`Error loading localStorage key "${key}":`, error);
+      if (process.env.NODE_ENV === "development") {
+        console.error(`Error loading localStorage key "${key}":`, error);
+      }
     }
     setIsHydrated(true);
   }, [key]);
@@ -39,7 +41,9 @@ export function useLocalStorage<T>(
         );
       }
     } catch (error) {
-      console.error(`Error setting localStorage key "${key}":`, error);
+      if (process.env.NODE_ENV === "development") {
+        console.error(`Error setting localStorage key "${key}":`, error);
+      }
     }
   };
 

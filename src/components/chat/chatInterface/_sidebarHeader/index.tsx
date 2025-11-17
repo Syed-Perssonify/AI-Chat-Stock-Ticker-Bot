@@ -34,7 +34,7 @@ export function SidebarHeader({ onNewChat, onSearchOpen }: SidebarHeaderProps) {
       <div className="group-data-[collapsible=icon]:hidden">
         <div className="mb-4">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="font-semibold">Drop Analysis</h2>
+            <h2 className="font-semibold">SEC Agent</h2>
             <SidebarTrigger className="h-8 w-8 shrink-0">
               <PanelLeftClose className="h-4 w-4" />
             </SidebarTrigger>

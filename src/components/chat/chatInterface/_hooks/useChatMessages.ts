@@ -66,27 +66,10 @@ export function useChatMessages({
         const localMessagesAhead = currentMessagesLength > chatMessagesLength;
 
         if (chatIdChanged || (chatMessagesLength > 0 && !localMessagesAhead)) {
-          console.log("useChatMessages: Updating messages from chat", {
-            chatId,
-            chatIdChanged,
-            messagesChanged,
-            chatMessagesLength,
-            currentMessagesLength,
-            localMessagesAhead,
-          });
           setMessages(currentChat.messages);
           setSettings(currentChat.settings);
           prevChatIdRef.current = chatId;
           prevMessagesRef.current = currentChat.messages;
-        } else {
-          console.log(
-            "useChatMessages: Skipping update - local messages ahead or chat empty",
-            {
-              chatMessagesLength,
-              currentMessagesLength,
-              localMessagesAhead,
-            }
-          );
         }
       }
     } else if (

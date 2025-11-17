@@ -31,7 +31,9 @@ function LoginForm() {
           setIsChecking(false);
         }
       } catch (error) {
-        console.error("Auth check error:", error);
+        if (process.env.NODE_ENV === "development") {
+          console.error("Auth check error:", error);
+        }
         setIsChecking(false);
       }
     };
@@ -80,7 +82,9 @@ function LoginForm() {
         setPassword("");
       }
     } catch (error) {
-      console.error("Login error:", error);
+      if (process.env.NODE_ENV === "development") {
+        console.error("Login error:", error);
+      }
       toast({
         title: "Error",
         description: "Failed to connect to server. Please try again.",
@@ -113,7 +117,7 @@ function LoginForm() {
               <Lock className="h-8 w-8 text-primary" />
             </div>
           </div>
-          <h1 className="text-3xl font-bold">Drop Analysis</h1>
+          <h1 className="text-3xl font-bold">SEC Agent</h1>
           <p className="text-muted-foreground">
             Enter your password to continue
           </p>

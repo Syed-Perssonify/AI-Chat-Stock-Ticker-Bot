@@ -123,24 +123,13 @@ export function StreamDataView({ streamData }: StreamDataViewProps) {
               </div>
               <div className="space-y-2">
                 {filteredToolCalls.map((call, idx) => (
-                  <div
-                    key={idx}
-                    className="bg-background p-2 rounded border space-y-1"
-                  >
+                  <div key={idx} className="bg-background p-2 rounded border">
                     <div className="flex items-center gap-2">
                       <Wrench className="h-3 w-3 text-primary" />
                       <span className="text-xs font-mono font-semibold">
                         {call.tool}
                       </span>
                     </div>
-                    {call.input && (
-                      <div className="text-xs text-muted-foreground pl-5 break-words">
-                        Input:{" "}
-                        {call.input.length > 200
-                          ? `${call.input.substring(0, 200)}...`
-                          : call.input}
-                      </div>
-                    )}
                   </div>
                 ))}
               </div>
@@ -155,23 +144,13 @@ export function StreamDataView({ streamData }: StreamDataViewProps) {
               </div>
               <div className="space-y-2">
                 {filteredToolResults.map((result, idx) => (
-                  <div
-                    key={idx}
-                    className="bg-background p-2 rounded border space-y-1"
-                  >
+                  <div key={idx} className="bg-background p-2 rounded border">
                     <div className="flex items-center gap-2">
                       <CheckCircle2 className="h-3 w-3 text-green-600" />
                       <span className="text-xs font-mono font-semibold">
                         {result.tool}
                       </span>
                     </div>
-                    {result.output && (
-                      <div className="text-xs text-muted-foreground pl-5 break-words max-h-[150px] overflow-y-auto">
-                        {result.output.length > 500
-                          ? `${result.output.substring(0, 500)}... (truncated)`
-                          : result.output}
-                      </div>
-                    )}
                   </div>
                 ))}
               </div>

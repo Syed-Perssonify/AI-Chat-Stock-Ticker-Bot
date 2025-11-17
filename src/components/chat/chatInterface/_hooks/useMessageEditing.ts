@@ -121,7 +121,9 @@ export function useMessageEditing({
           ];
         });
       } catch (error: any) {
-        console.error("Error sending edited message:", error);
+        if (process.env.NODE_ENV === "development") {
+          console.error("Error sending edited message:", error);
+        }
         toast({
           title: "Error",
           description:

@@ -25,7 +25,9 @@ export function useAuth(): UseAuthReturn {
       setIsAuthenticated(data.authenticated);
       return data.authenticated;
     } catch (error) {
-      console.error("Auth check error:", error);
+      if (process.env.NODE_ENV === "development") {
+        console.error("Auth check error:", error);
+      }
       setIsAuthenticated(false);
       return false;
     } finally {
@@ -56,7 +58,9 @@ export function useAuth(): UseAuthReturn {
         });
       }
     } catch (error) {
-      console.error("Logout error:", error);
+      if (process.env.NODE_ENV === "development") {
+        console.error("Logout error:", error);
+      }
       toast({
         title: "Error",
         description: "Failed to connect to server.",

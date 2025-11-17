@@ -1,4 +1,4 @@
 export const params = {
-  name: "Drop Analysis",
+  name: "SEC Agent",
   tagline: "SEC Filing Analysis",
 } as const;

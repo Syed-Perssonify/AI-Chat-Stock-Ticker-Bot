@@ -35,8 +35,6 @@ export function useChat({
 
   const streamOpenAIResponse = useCallback(
     async (messages: Message[], messageId: string) => {
-      console.log("Sending request to /api/chat with settings:", settings);
-
       const response = await fetch("/api/chat", {
         method: "POST",
         headers: {
@@ -52,13 +50,13 @@ export function useChat({
         signal: abortControllerRef.current?.signal,
       });
 
-      console.log("API Response status:", response.status, response.statusText);
-
       if (!response.ok) {
         const error = await response
           .json()
           .catch(() => ({ error: "Unknown error" }));
-        console.error("API Error Response:", error);
+        if (process.env.NODE_ENV === "development") {
+          console.error("API Error Response:", error);
+        }
         throw new Error(
           error.error ||
             `Failed to get response: ${response.status} ${response.statusText}`
@@ -88,12 +86,8 @@ export function useChat({
       while (true) {
         const { done, value } = await reader.read();
         if (done) {
-          console.log(
-            "Stream completed. Total content length:",
-            fullContent.length
-          );
           if (!hasReceivedData && fullContent.length === 0) {
-            console.warn("No data received from stream!");
+            // Stream completed with no data - this is handled by the empty response check below
           }
           break;
         }
@@ -106,7 +100,6 @@ export function useChat({
           if (line.startsWith("data: ")) {
             const data = line.slice(6);
             if (data === "[DONE]") {
-              console.log("Received [DONE] signal");
               break;
             }
 
@@ -141,14 +134,10 @@ export function useChat({
                 streamData: accumulatedStreamData,
               });
             } catch (e) {
-              console.warn("Failed to parse stream data:", data, e);
+              // Skip invalid JSON in stream data
             }
           }
         }
-      }
-
-      if (fullContent.length === 0) {
-        console.warn("Stream completed but no content was received!");
       }
 
       return { content: fullContent, streamData: accumulatedStreamData };
@@ -183,15 +172,8 @@ export function useChat({
         if (!abortControllerRef.current?.signal.aborted) {
           const content = typeof result === "string" ? result : result.content;
 
-          console.log("Final content length:", content?.length || 0);
-          console.log(
-            "Content preview:",
-            content?.substring(0, 100) || "empty"
-          );
-
           // Check if we got an empty response
           if (!content || content.trim().length === 0) {
-            console.error("Received empty response from API");
             toast({
               title: "Empty Response",
               description:
@@ -210,23 +192,16 @@ export function useChat({
                 typeof result === "string" ? undefined : result.streamData,
             };
 
-            console.log(
-              "Adding assistant message to messages array:",
-              assistantMessage.id
-            );
             setMessages((prev) => {
-              const updated = [...prev, assistantMessage];
-              console.log("Messages after adding assistant:", updated.length);
-              return updated;
+              return [...prev, assistantMessage];
             });
             setStreamingMessage(null);
-            console.log("Streaming message cleared");
           }
-        } else {
-          console.log("Request was aborted, not adding message");
         }
       } catch (error: any) {
-        console.error("Error sending message:", error);
+        if (process.env.NODE_ENV === "development") {
+          console.error("Error sending message:", error);
+        }
 
         // Remove the user message if there was an error
         setMessages(messages);

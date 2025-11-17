@@ -94,10 +94,6 @@ export async function POST(req: NextRequest) {
       dropAnalysisUrl = `${DROPANALYSIS_API_URL}/query/stream?${urlParams.toString()}`;
     }
 
-    // Log the URL being called for debugging
-    console.log("Calling DropAnalysis API:", dropAnalysisUrl);
-    console.log("Settings:", JSON.stringify(chatSettings, null, 2));
-
     // Fetch from DropAnalysis
     let response: Response;
     try {
@@ -267,7 +263,6 @@ export async function POST(req: NextRequest) {
                   }
                 } catch (e) {
                   // Skip invalid JSON
-                  console.warn("Failed to parse SSE data:", dataStr);
                 }
               }
             }
