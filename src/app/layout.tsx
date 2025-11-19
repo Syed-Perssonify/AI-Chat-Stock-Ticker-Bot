@@ -59,9 +59,9 @@ export const metadata: Metadata = {
     description: params.description,
     images: [
       {
-        url: params.socialImage,
-        width: 512,
-        height: 512,
+        url: "/icons/og-image.png",
+        width: 1200,
+        height: 630,
         alt: `${params.name} - ${params.tagline}`,
       },
     ],
@@ -70,10 +70,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: params.name,
     description: params.description,
-    images: [params.socialImage],
-    creator: params.twitterHandle.startsWith("@")
-      ? params.twitterHandle
-      : `@${params.twitterHandle}`,
+    images: ["/icons/og-image.png"],
   },
   appleWebApp: {
     capable: true,

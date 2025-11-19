@@ -5,8 +5,7 @@ export const params = {
   description:
     "AI-powered SEC filing analysis tool. Analyze 10-K, 10-Q, and other SEC filings with intelligent insights and comprehensive data extraction.",
   socialImage: "/icons/og-image.png",
-  favicon: "/icons/android-chrome-192x192.png", // Larger favicon for better visibility
-  twitterHandle: "@DropAnalysis", // Your Twitter/X handle (without @ if you prefer)
+  favicon: "/icons/android-chrome-192x192.png",
 } as const;
 
 export const screenBreakpoints = {
