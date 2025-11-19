@@ -6,10 +6,11 @@ import { params } from "@/common/config/params";
 
 const inter = Inter({ subsets: ["latin"] });
 
+const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+const ogImageUrl = new URL("/icons/og-image.png", baseUrl).toString();
+
 export const metadata: Metadata = {
-  metadataBase: new URL(
-    process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"
-  ),
+  metadataBase: new URL(baseUrl),
   title: params.name,
   description: params.description,
   keywords: [
@@ -53,16 +54,17 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000",
+    url: baseUrl,
     siteName: params.name,
     title: params.name,
     description: params.description,
     images: [
       {
-        url: "/icons/og-image.png",
+        url: ogImageUrl,
         width: 1200,
         height: 630,
         alt: `${params.name} - ${params.tagline}`,
+        type: "image/png",
       },
     ],
   },
@@ -70,7 +72,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: params.name,
     description: params.description,
-    images: ["/icons/og-image.png"],
+    images: [ogImageUrl],
   },
   appleWebApp: {
     capable: true,
