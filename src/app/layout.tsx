@@ -11,31 +11,39 @@ export const metadata: Metadata = {
     process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"
   ),
   title: params.name,
-  description: params.tagline,
+  description: params.description,
+  keywords: [
+    "SEC filings",
+    "10-K",
+    "10-Q",
+    "financial analysis",
+    "AI analysis",
+    "EDGAR",
+    "stock analysis",
+  ],
+  authors: [{ name: params.name }],
+  creator: params.name,
+  publisher: params.name,
   icons: {
     icon: [
       {
-        url: "/icons/android-chrome-512x512.png",
-        sizes: "512x512",
+        url: params.favicon,
+        sizes: "192x192",
         type: "image/png",
       },
       {
-        url: "/icons/android-chrome-192x192.png",
-        sizes: "192x192",
+        url: "/icons/android-chrome-512x512.png",
+        sizes: "512x512",
         type: "image/png",
       },
       { url: "/icons/favicon-32x32.png", sizes: "32x32", type: "image/png" },
       { url: "/icons/favicon-16x16.png", sizes: "16x16", type: "image/png" },
+      { url: "/icons/favicon.ico", sizes: "any" },
     ],
     shortcut: [
       {
-        url: "/icons/android-chrome-192x192.png",
+        url: params.favicon,
         sizes: "192x192",
-        type: "image/png",
-      },
-      {
-        url: "/icons/android-chrome-512x512.png",
-        sizes: "512x512",
         type: "image/png",
       },
     ],
@@ -43,28 +51,45 @@ export const metadata: Metadata = {
   },
   manifest: "/icons/site.webmanifest",
   openGraph: {
-    title: params.name,
-    description: params.tagline,
     type: "website",
+    locale: "en_US",
+    url: process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000",
+    siteName: params.name,
+    title: params.name,
+    description: params.description,
     images: [
       {
-        url: "/icons/android-chrome-512x512.png",
+        url: params.socialImage,
         width: 512,
         height: 512,
-        alt: params.name,
+        alt: `${params.name} - ${params.tagline}`,
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
     title: params.name,
-    description: params.tagline,
-    images: ["/icons/android-chrome-512x512.png"],
+    description: params.description,
+    images: [params.socialImage],
+    creator: params.twitterHandle.startsWith("@")
+      ? params.twitterHandle
+      : `@${params.twitterHandle}`,
   },
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
     title: params.name,
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
   },
 };
 

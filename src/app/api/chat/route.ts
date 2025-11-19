@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 
-// DropAnalysis API URL - defaults to localhost:8000
 const DROPANALYSIS_API_URL =
   process.env.DROPANALYSIS_API_URL || "http://localhost:8000";
 
@@ -12,7 +11,6 @@ interface ChatSettings {
   deepAnalysis?: boolean;
 }
 
-// Helper to format date for DropAnalysis (YYYY-MM-DD)
 function formatDate(date: Date | string | null): string | null {
   if (!date) return null;
   const d = typeof date === "string" ? new Date(date) : date;
@@ -24,7 +22,6 @@ export async function POST(req: NextRequest) {
   try {
     const { messages, settings } = await req.json();
 
-    // Validate DropAnalysis URL
     if (!DROPANALYSIS_API_URL) {
       return NextResponse.json(
         { error: "DropAnalysis API URL is not configured" },
@@ -32,7 +29,6 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Get the last user message
     const lastMessage = messages
       .slice()
       .reverse()
@@ -45,26 +41,23 @@ export async function POST(req: NextRequest) {
 
     const chatSettings: ChatSettings = settings || {};
 
-    // Determine which endpoint to use based on settings
     const hasTicker = chatSettings.stockTicker?.trim();
     const hasFormTypes = chatSettings.formTypes?.trim();
     const hasDateRange = chatSettings.startDate || chatSettings.endDate;
 
-    // Use structured analysis if ticker is provided
     const useStructuredAnalysis = !!hasTicker;
 
     let dropAnalysisUrl: string;
     let urlParams: URLSearchParams;
 
     if (useStructuredAnalysis) {
-      // Use /analyze/stream endpoint for structured analysis
       urlParams = new URLSearchParams();
       urlParams.append("ticker", chatSettings.stockTicker!.trim());
 
       if (hasFormTypes) {
         urlParams.append("form_types", chatSettings.formTypes!.trim());
       } else {
-        urlParams.append("form_types", "10-K"); // Default
+        urlParams.append("form_types", "10-K");
       }
 
       const startDate = formatDate(chatSettings.startDate);
@@ -77,24 +70,20 @@ export async function POST(req: NextRequest) {
         urlParams.append("end_date", endDate);
       }
 
-      // Use deep_analysis from settings
       const deepAnalysis = chatSettings.deepAnalysis || false;
       urlParams.append("deep_analysis", deepAnalysis.toString());
 
-      // If user provided a query, use it as analysis_goal
       if (query.trim() && query.trim().length > 10) {
         urlParams.append("analysis_goal", query.trim());
       }
 
       dropAnalysisUrl = `${DROPANALYSIS_API_URL}/analyze/stream?${urlParams.toString()}`;
     } else {
-      // Use /query/stream endpoint for free-form queries
       urlParams = new URLSearchParams();
       urlParams.append("query", query);
       dropAnalysisUrl = `${DROPANALYSIS_API_URL}/query/stream?${urlParams.toString()}`;
     }
 
-    // Fetch from DropAnalysis
     let response: Response;
     try {
       response = await fetch(dropAnalysisUrl, {
@@ -125,7 +114,6 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Create a readable stream that transforms DropAnalysis events to frontend format
     const encoder = new TextEncoder();
     const decoder = new TextDecoder();
     const readable = new ReadableStream({
@@ -164,7 +152,7 @@ export async function POST(req: NextRequest) {
 
             buffer += decoder.decode(value, { stream: true });
             const lines = buffer.split("\n");
-            buffer = lines.pop() || ""; // Keep incomplete line in buffer
+            buffer = lines.pop() || "";
 
             for (let i = 0; i < lines.length; i++) {
               const line = lines[i];
@@ -181,14 +169,11 @@ export async function POST(req: NextRequest) {
                 try {
                   const data = JSON.parse(dataStr);
 
-                  // Handle different event types from DropAnalysis
                   if (currentEventType === "final_answer" && data.answer) {
-                    // final_answer event - stream only the new portion
                     const answer = data.answer;
                     const newContent = answer.slice(lastAnswerLength);
                     if (newContent) {
                       lastAnswerLength = answer.length;
-                      // Stream in chunks for better performance
                       const chunkSize = 50;
                       for (let j = 0; j < newContent.length; j += chunkSize) {
                         const chunk = newContent.slice(j, j + chunkSize);
@@ -200,7 +185,6 @@ export async function POST(req: NextRequest) {
                       }
                     }
                   } else if (currentEventType === "thinking" && data.content) {
-                    // thinking event - accumulate and stream
                     streamData.thinking.push(data.content);
                     controller.enqueue(
                       encoder.encode(
@@ -211,7 +195,6 @@ export async function POST(req: NextRequest) {
                       )
                     );
                   } else if (currentEventType === "tool_call" && data.tool) {
-                    // tool_call event - accumulate
                     streamData.toolCalls.push({
                       tool: data.tool,
                       input: data.input || "",
@@ -225,7 +208,6 @@ export async function POST(req: NextRequest) {
                       )
                     );
                   } else if (currentEventType === "tool_result" && data.tool) {
-                    // tool_result event - accumulate
                     streamData.toolResults.push({
                       tool: data.tool,
                       output: data.output || "",
@@ -239,7 +221,6 @@ export async function POST(req: NextRequest) {
                       )
                     );
                   } else if (currentEventType === "start" && data.query) {
-                    // start event - store query info
                     streamData.start = {
                       query: data.query,
                       timestamp: data.timestamp,
@@ -252,7 +233,6 @@ export async function POST(req: NextRequest) {
                       )
                     );
                   } else if (currentEventType === "error" && data.error) {
-                    // error event
                     controller.enqueue(
                       encoder.encode(
                         `data: ${JSON.stringify({
@@ -261,14 +241,11 @@ export async function POST(req: NextRequest) {
                       )
                     );
                   }
-                } catch (e) {
-                  // Skip invalid JSON
-                }
+                } catch (e) {}
               }
             }
           }
 
-          // Send final stream data before completion
           if (
             streamData.thinking.length > 0 ||
             streamData.toolCalls.length > 0 ||
@@ -284,7 +261,6 @@ export async function POST(req: NextRequest) {
             );
           }
 
-          // Send done signal
           controller.enqueue(encoder.encode("data: [DONE]\n\n"));
           controller.close();
         } catch (error: any) {

@@ -6,7 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { ROUTES } from "@/common/routes";
+import { routes } from "@/common/config/routes";
+import { params } from "@/common/config/params";
 import { Loader2, Lock } from "lucide-react";
 
 function LoginForm() {
@@ -26,7 +27,7 @@ function LoginForm() {
 
         if (data.authenticated) {
           const redirect = searchParams.get("redirect");
-          router.push(redirect || ROUTES.NEW_CHAT);
+          router.push(redirect || routes.NEW_CHAT);
         } else {
           setIsChecking(false);
         }
@@ -72,7 +73,7 @@ function LoginForm() {
           description: "Redirecting to chat...",
         });
         const redirect = searchParams.get("redirect");
-        router.push(redirect || ROUTES.NEW_CHAT);
+        router.push(redirect || routes.NEW_CHAT);
       } else {
         toast({
           title: "Login failed",
@@ -117,7 +118,7 @@ function LoginForm() {
               <Lock className="h-8 w-8 text-primary" />
             </div>
           </div>
-          <h1 className="text-3xl font-bold">SEC Agent</h1>
+          <h1 className="text-3xl font-bold">{params.name}</h1>
           <p className="text-muted-foreground">
             Enter your password to continue
           </p>

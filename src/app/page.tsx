@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
-import { ROUTES } from "@/common/routes";
+import { routes } from "@/common/config/routes";
 
 export default function Home() {
-  redirect(ROUTES.NEW_CHAT);
+  redirect(routes.NEW_CHAT);
 }

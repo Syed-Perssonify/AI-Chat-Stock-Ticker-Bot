@@ -1,6 +1,6 @@
 import { useCallback, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { ROUTES, getChatRoute } from "@/common/routes";
+import { routes } from "@/common/config/routes";
 import { ChatSettings } from "@/types/chat";
 
 interface UseChatRoutingProps {
@@ -54,7 +54,7 @@ export function useChatRouting({
         // Select the chat immediately so it's available for message sending
         selectChat(newChatId);
         // Navigate to the chat route (use replace to avoid back button issues)
-        router.replace(getChatRoute(newChatId));
+        router.replace(routes.CHAT + "/" + newChatId);
 
         // Wait for navigation and state updates to complete
         // Poll until currentChatId matches the new chat ID to ensure state is synced
@@ -94,7 +94,7 @@ export function useChatRouting({
     (onClearMessages?: () => void, onCloseSidebar?: () => void) => {
       onClearMessages?.();
       onCloseSidebar?.();
-      router.push(ROUTES.NEW_CHAT);
+      router.push(routes.NEW_CHAT);
     },
     [router]
   );
@@ -102,7 +102,7 @@ export function useChatRouting({
   const handleSelectChat = useCallback(
     (chatId: string) => {
       selectChat(chatId);
-      router.push(getChatRoute(chatId));
+      router.push(routes.CHAT + "/" + chatId);
     },
     [selectChat, router]
   );

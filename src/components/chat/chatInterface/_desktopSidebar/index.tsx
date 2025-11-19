@@ -1,8 +1,9 @@
 "use client";
 
 import { Sidebar, SidebarContent } from "@/components/ui/sidebar";
-import { ChatHistory } from "@/components/chat/ChatHistory";
+import { ChatHistory } from "@/components/chat/chatHistory";
 import { SidebarHeader } from "../_sidebarHeader";
+import { screenBreakpoints } from "@/common/config/params";
 
 interface DesktopSidebarProps {
   chats: any[];
@@ -24,7 +25,10 @@ export function DesktopSidebar({
   onSearchOpen,
 }: DesktopSidebarProps) {
   return (
-    <Sidebar collapsible="icon" className="border-r hidden min-[1080px]:block">
+    <Sidebar
+      collapsible="icon"
+      className="border-r hidden min-[${screenBreakpoints.DESKTOP}px]:block"
+    >
       <SidebarHeader onNewChat={onNewChat} onSearchOpen={onSearchOpen} />
       <SidebarContent className="group-data-[collapsible=icon]:opacity-0 group-data-[collapsible=icon]:pointer-events-none">
         <ChatHistory

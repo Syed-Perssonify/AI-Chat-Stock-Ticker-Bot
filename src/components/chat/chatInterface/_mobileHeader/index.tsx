@@ -7,9 +7,11 @@ import {
   SheetTrigger,
   SheetTitle,
 } from "@/components/ui/sheet";
-import { Menu, Settings } from "lucide-react";
+import { Menu } from "lucide-react";
 import { MobileSidebar } from "../_mobileSidebar";
-import { SettingsPanel } from "@/components/chat/SettingsPanel";
+import { MobileSettingsWrapper } from "@/components/chat/settingsPanel/_settingsWrapper";
+import { params } from "@/common/config/params";
+import { ChatSettings } from "@/types/chat";
 
 interface MobileHeaderProps {
   sidebarOpen: boolean;
@@ -22,8 +24,8 @@ interface MobileHeaderProps {
   chats: any[];
   currentChatId: string | null;
   deleteChat: (chatId: string) => void;
-  settings: any;
-  onSettingsChange: (settings: any) => void;
+  settings: ChatSettings;
+  onSettingsChange: (settings: ChatSettings) => void;
 }
 
 export function MobileHeader({
@@ -68,28 +70,14 @@ export function MobileHeader({
         </SheetContent>
       </Sheet>
 
-      <h1 className="text-base font-semibold truncate">DropAnalysis</h1>
+      <h1 className="text-base font-semibold truncate">{params.displayName}</h1>
 
-      <Sheet open={settingsOpen} onOpenChange={setSettingsOpen}>
-        <SheetTrigger asChild>
-          <Button variant="ghost" size="icon" className="h-9 w-9">
-            <Settings className="h-5 w-5" />
-          </Button>
-        </SheetTrigger>
-        <SheetContent
-          side="right"
-          className="p-0 w-[85vw] sm:w-[380px] [&>button]:hidden"
-        >
-          <SheetTitle className="sr-only">Settings</SheetTitle>
-          <div className="h-full flex flex-col">
-            <SettingsPanel
-              settings={settings}
-              onChange={onSettingsChange}
-              onClose={() => setSettingsOpen(false)}
-            />
-          </div>
-        </SheetContent>
-      </Sheet>
+      <MobileSettingsWrapper
+        settings={settings}
+        onChange={onSettingsChange}
+        open={settingsOpen}
+        onOpenChange={setSettingsOpen}
+      />
     </div>
   );
 }

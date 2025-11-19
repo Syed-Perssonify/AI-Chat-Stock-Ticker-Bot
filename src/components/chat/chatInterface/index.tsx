@@ -4,23 +4,24 @@ import { useState, useEffect, useRef } from "react";
 import { useParams, usePathname } from "next/navigation";
 import { useChat } from "@/hooks/useChat";
 import { useChatHistory } from "@/hooks/useChatHistory";
-import { MessageList } from "./MessageList";
-import { ChatInput } from "./ChatInput";
+import { MessageList } from "../messageList";
+import { ChatInput } from "../chatInput";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { DEFAULT_SETTINGS } from "@/types/chat";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
-import { MobileHeader } from "./chatInterface/_mobileHeader";
-import { DesktopSidebar } from "./chatInterface/_desktopSidebar";
-import { SearchDialog } from "./chatInterface/_searchDialog";
-import { DesktopSettingsPanel } from "./chatInterface/_desktopSettingsPanel";
-import { ROUTES } from "@/common/routes";
-import { useChatRouting } from "./chatInterface/_hooks/useChatRouting";
-import { useChatSync } from "./chatInterface/_hooks/useChatSync";
-import { useMessageEditing } from "./chatInterface/_hooks/useMessageEditing";
-import { useChatMessages } from "./chatInterface/_hooks/useChatMessages";
-import { useChatTitle } from "./chatInterface/_hooks/useChatTitle";
-import { ChatHeader } from "./chatInterface/_chatHeader";
+import { MobileHeader } from "./_mobileHeader";
+import { DesktopSidebar } from "./_desktopSidebar";
+import { SearchDialog } from "./_searchDialog";
+import { DesktopSettingsPanel } from "./_desktopSettingsPanel";
+import { routes } from "@/common/config/routes";
+import { screenBreakpoints, cookieNames } from "@/common/config/params";
+import { useChatRouting } from "./_hooks/useChatRouting";
+import { useChatSync } from "./_hooks/useChatSync";
+import { useMessageEditing } from "./_hooks/useMessageEditing";
+import { useChatMessages } from "./_hooks/useChatMessages";
+import { useChatTitle } from "./_hooks/useChatTitle";
+import { ChatHeader } from "./_chatHeader";
 
 interface ChatContentProps {
   chatId?: string;
@@ -37,7 +38,7 @@ function ChatContent({ chatId: chatIdProp }: ChatContentProps) {
   // Get chatId from props or URL params
   const chatIdFromUrl = params?.chatId as string | undefined;
   const chatId = chatIdProp || chatIdFromUrl;
-  const isNewChatRoute = pathname === ROUTES.NEW_CHAT;
+  const isNewChatRoute = pathname === routes.NEW_CHAT;
 
   const {
     chats,
@@ -235,12 +236,11 @@ export function ChatInterface(
     // Set sidebar state based on screen size
     const updateSidebarState = () => {
       if (typeof window !== "undefined") {
-        const isLargeScreen = window.innerWidth >= 1080;
+        const isLargeScreen = window.innerWidth >= screenBreakpoints.DESKTOP;
         if (isLargeScreen) {
-          // On large screens, read from cookie or default to true
           const cookies = document.cookie.split("; ");
           const sidebarCookie = cookies.find((c) =>
-            c.startsWith("sidebar:state=")
+            c.startsWith(`${cookieNames.SIDEBAR_STATE}=`)
           );
           if (sidebarCookie) {
             const isOpen = sidebarCookie.split("=")[1] === "true";
@@ -249,7 +249,6 @@ export function ChatInterface(
             setSidebarOpen(true);
           }
         } else {
-          // On small screens, always force closed
           setSidebarOpen(false);
         }
       }
@@ -268,7 +267,10 @@ export function ChatInterface(
       open={sidebarOpen}
       onOpenChange={(open) => {
         // Only allow opening on large screens
-        if (typeof window !== "undefined" && window.innerWidth >= 1080) {
+        if (
+          typeof window !== "undefined" &&
+          window.innerWidth >= screenBreakpoints.DESKTOP
+        ) {
           setSidebarOpen(open);
         } else {
           // Force closed on small screens

@@ -6,12 +6,12 @@ import { format } from "date-fns";
 import { toast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
-import { MessageAvatar } from "./chatMessage/_messageAvatar";
-import { MessageEditor } from "./chatMessage/_messageEditor";
-import { MessageBubble } from "./chatMessage/_messageBubble";
-import { AIMessageActions } from "./chatMessage/_aiMessageActions";
-import { UserMessageActions } from "./chatMessage/_userMessageActions";
-import { StreamDataView } from "./chatMessage/_streamDataView";
+import { MessageAvatar } from "./_messageAvatar";
+import { MessageEditor } from "./_messageEditor";
+import { MessageBubble } from "./_messageBubble";
+import { AIMessageActions } from "./_aiMessageActions";
+import { UserMessageActions } from "./_userMessageActions";
+import { StreamDataView } from "./_streamDataView";
 
 interface ChatMessageProps {
   message: Message;

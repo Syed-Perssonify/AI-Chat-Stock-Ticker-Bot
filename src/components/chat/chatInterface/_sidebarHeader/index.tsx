@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { cn } from "@/lib/utils";
+import { params } from "@/common/config/params";
 
 interface SidebarHeaderProps {
   onNewChat: () => void;
@@ -34,7 +35,7 @@ export function SidebarHeader({ onNewChat, onSearchOpen }: SidebarHeaderProps) {
       <div className="group-data-[collapsible=icon]:hidden">
         <div className="mb-4">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="font-semibold">SEC Agent</h2>
+            <h2 className="font-semibold">{params.name}</h2>
             <SidebarTrigger className="h-8 w-8 shrink-0">
               <PanelLeftClose className="h-4 w-4" />
             </SidebarTrigger>

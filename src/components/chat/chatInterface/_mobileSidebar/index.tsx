@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { ChatHistory } from "@/components/chat/ChatHistory";
+import { ChatHistory } from "@/components/chat/chatHistory";
 import { CircleFadingPlus, Search } from "lucide-react";
 
 interface MobileSidebarProps {

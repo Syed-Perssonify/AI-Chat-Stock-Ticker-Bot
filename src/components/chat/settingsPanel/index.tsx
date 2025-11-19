@@ -2,10 +2,10 @@
 
 import { ChatSettings, DEFAULT_SETTINGS } from "@/types/chat";
 import { Separator } from "@/components/ui/separator";
-import { SettingsPanelHeader } from "./settingsPanel/_settingsPanelHeader";
-import { TextInputSetting } from "./settingsPanel/_textInputSetting";
-import { FormTypesInput } from "./settingsPanel/_formTypesInput";
-import { DatePickerSetting } from "./settingsPanel/_datePickerSetting";
+import { SettingsPanelHeader } from "./_settingsPanelHeader";
+import { TextInputSetting } from "./_textInputSetting";
+import { FormTypesInput } from "./_formTypesInput";
+import { DatePickerSetting } from "./_datePickerSetting";
 
 interface SettingsPanelProps {
   settings: ChatSettings;

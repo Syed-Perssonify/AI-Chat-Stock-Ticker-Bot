@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
-import { ROUTES } from "@/common/routes";
+import { routes } from "@/common/config/routes";
 
 interface UseAuthReturn {
   isAuthenticated: boolean | null;
@@ -49,7 +49,7 @@ export function useAuth(): UseAuthReturn {
           title: "Logged out",
           description: "You have been successfully logged out",
         });
-        router.push(ROUTES.LOGIN);
+        router.push(routes.HOME);
       } else {
         toast({
           title: "Logout failed",

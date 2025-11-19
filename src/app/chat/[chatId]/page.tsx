@@ -1,7 +1,7 @@
 "use client";
 
 import { use } from "react";
-import { ChatInterface } from "@/components/chat/ChatInterface";
+import { ChatInterface } from "@/components/chat/chatInterface";
 
 interface ChatPageProps {
   params: Promise<{

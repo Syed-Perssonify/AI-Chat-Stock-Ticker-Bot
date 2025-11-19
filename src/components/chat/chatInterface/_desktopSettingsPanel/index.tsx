@@ -1,19 +1,16 @@
 "use client";
 
-import { SettingsPanel } from "@/components/chat/SettingsPanel";
+import { DesktopSettingsWrapper } from "@/components/chat/settingsPanel/_settingsWrapper";
+import { ChatSettings } from "@/types/chat";
 
 interface DesktopSettingsPanelProps {
-  settings: any;
-  onChange: (settings: any) => void;
+  settings: ChatSettings;
+  onChange: (settings: ChatSettings) => void;
 }
 
 export function DesktopSettingsPanel({
   settings,
   onChange,
 }: DesktopSettingsPanelProps) {
-  return (
-    <div className="w-80 shrink-0 border-l">
-      <SettingsPanel settings={settings} onChange={onChange} />
-    </div>
-  );
+  return <DesktopSettingsWrapper settings={settings} onChange={onChange} />;
 }

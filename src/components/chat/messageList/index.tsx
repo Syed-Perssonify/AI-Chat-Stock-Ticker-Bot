@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Message } from "@/types/chat";
-import { ChatMessage } from "./ChatMessage";
+import { ChatMessage } from "../chatMessage";
 import { Skeleton } from "@/components/ui/skeleton";
 
 interface MessageListProps {

@@ -1,7 +1,7 @@
 {
-  "name": "SEC Agent",
-  "short_name": "DropAnalysis",
-  "description": "SEC Filing Analysis",
+  "name": "SEC Agent - SEC Filing Analysis",
+  "short_name": "SEC Agent",
+  "description": "AI-powered SEC filing analysis tool",
   "icons": [
     {
       "src": "/icons/android-chrome-192x192.png",
