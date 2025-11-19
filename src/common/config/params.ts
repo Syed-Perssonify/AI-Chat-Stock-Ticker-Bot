@@ -4,7 +4,7 @@ export const params = {
   displayName: "DropAnalysis",
   description:
     "AI-powered SEC filing analysis tool. Analyze 10-K, 10-Q, and other SEC filings with intelligent insights and comprehensive data extraction.",
-  socialImage: "/icons/android-chrome-512x512.png", // Social sharing image (1200x630 recommended)
+  socialImage: "/icons/og-image.png",
   favicon: "/icons/android-chrome-192x192.png", // Larger favicon for better visibility
   twitterHandle: "@DropAnalysis", // Your Twitter/X handle (without @ if you prefer)
 } as const;
